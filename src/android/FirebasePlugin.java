@@ -183,7 +183,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
-                    firestore = FirebaseFirestore.getInstance();                  
+                    firestore = FirebaseFirestore.getInstance();
                     functions = FirebaseFunctions.getInstance();
 
                     gson = new GsonBuilder()
@@ -247,7 +247,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }else if(action.equals("setCrashlyticsUserId")){
                 this.setCrashlyticsUserId(callbackContext, args.getString(0));
             } else if (action.equals("setScreenName")) {
-                this.setScreenName(callbackContext, args.getString(0));
+                this.setScreenName(callbackContext, args.getJSONObject(0));
             } else if (action.equals("setUserId")) {
                 this.setUserId(callbackContext, args.getString(0));
             } else if (action.equals("setUserProperty")) {
@@ -845,12 +845,15 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void setScreenName(final CallbackContext callbackContext, final String name) {
+    private void setScreenName(final CallbackContext callbackContext, final JSONObject params)
+            throws JSONException {
+        final Bundle bundle = this.createBundleFromJSONObject(params);
         // This must be called on the main thread
         cordovaActivity.runOnUiThread(new Runnable() {
             public void run() {
                 try {
-                    mFirebaseAnalytics.setCurrentScreen(cordovaActivity, name, null);
+                    // mFirebaseAnalytics.setCurrentScreen(cordovaActivity, name, null);
+                    mFirebaseAnalytics.logEvent("screen_view", bundle, null);
                     callbackContext.success();
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
